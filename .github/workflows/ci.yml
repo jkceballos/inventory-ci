@@ -62,4 +62,8 @@ jobs:
 
     # Test simple del frontend
     - name: Run frontend tests
-      run: docker run -v /var/run/docker.sock:/var/run/docker.sock frontend:ci bash ./tests/test_frontend.sh
+      run: |
+        docker run -d -p 8080:80 --name frontend-test frontend:ci
+        sleep 3
+        curl -f http://localhost:8080 || (echo "Frontend not responding" && exit 1)
+        docker stop frontend-test && docker rm frontend-test
