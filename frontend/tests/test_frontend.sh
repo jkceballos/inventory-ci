@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 set -e
 container=$(docker run -d -p 8080:80 frontend:latest)
 sleep 2
