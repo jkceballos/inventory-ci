@@ -17,7 +17,7 @@ def get_items():
     rows = cur.fetchall()
     cur.close()
     conn.close()
-    return [{"id":r[0],"name":r[1],"quantity":r[2]} for r in rows]
+    return [{"id": r[0], "name": r[1], "quantity": r[2]} for r in rows]
 
 @app.route("/items")
 def items():

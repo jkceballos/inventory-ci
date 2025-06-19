@@ -9,6 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     services:
       db:
         image: postgres:15-alpine
@@ -16,7 +17,8 @@ jobs:
           POSTGRES_DB: inv
           POSTGRES_USER: invuser
           POSTGRES_PASSWORD: invpass
-        ports: ['5432:5432']
+        ports:
+          - 5432:5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -24,23 +26,39 @@ jobs:
           --health-retries 5
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    # Build backend image for testing
     - name: Build backend test image
       run: docker build -f backend/Dockerfile.test -t backend:ci ./backend
 
+    # Run backend tests with coverage
     - name: Run backend tests
-      run: docker run --env POSTGRES_DB=inv --env POSTGRES_USER=invuser --env POSTGRES_PASSWORD=invpass --env DB_HOST=host.docker.internal backend:ci
+      run: docker run \
+        --env PYTHONPATH=/app \
+        --env POSTGRES_DB=inv \
+        --env POSTGRES_USER=invuser \
+        --env POSTGRES_PASSWORD=invpass \
+        --env DB_HOST=host.docker.internal \
+        -v ${{ github.workspace }}/backend:/app \
+        backend:ci
 
+    # Subir a Codecov
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4
       with:
+        token: ${{ secrets.CODECOV_TOKEN }}
         files: backend/coverage.xml
         fail_ci_if_error: true
 
-    - name: Build frontend
+    # Build frontend
+    - name: Build frontend image
       run: docker build -t frontend:ci ./frontend
 
+    # Test simple del frontend
     - name: Run frontend tests
-      run: docker run -v /var/run/docker.sock:/var/run/docker.sock frontend:ci \
-           bash ./tests/test_frontend.sh
+      run: docker run -v /var/run/docker.sock:/var/run/docker.sock frontend:ci bash ./tests/test_frontend.sh
