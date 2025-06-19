@@ -3,7 +3,7 @@
 <h1>Inventario</h1>
 <table id="items"></table>
 <script>
-fetch("http://backend:5000/items")
+fetch("http://localhost:5000/items")
   .then(res => res.json())
   .then(data => {
     const t = document.querySelector("#items");
