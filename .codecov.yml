@@ -1,0 +1,7 @@
+coverage:
+  precision: 2
+  round: down
+  range: "0.0...1.0"
+parsers:
+  xml:
+    - pattern: "**/coverage.xml"

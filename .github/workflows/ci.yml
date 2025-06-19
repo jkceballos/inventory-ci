@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_DB: inv
+          POSTGRES_USER: invuser
+          POSTGRES_PASSWORD: invpass
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Build backend
+      run: docker build -t backend:ci ./backend
+
+    - name: Run backend tests
+      run: docker run --env POSTGRES_DB=inv --env POSTGRES_USER=invuser \
+        --env POSTGRES_PASSWORD=invpass --env DB_HOST=host.docker.internal \
+        backend:ci
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v4
+      with:
+        files: backend/coverage.xml
+        fail_ci_if_error: true
+
+    - name: Build frontend
+      run: docker build -t frontend:ci ./frontend
+
+    - name: Run frontend tests
+      run: docker run -v /var/run/docker.sock:/var/run/docker.sock frontend:ci \
+           bash ./tests/test_frontend.sh
