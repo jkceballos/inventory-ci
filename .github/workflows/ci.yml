@@ -30,9 +30,7 @@ jobs:
       run: docker build -t backend:ci ./backend
 
     - name: Run backend tests
-      run: docker run --env POSTGRES_DB=inv --env POSTGRES_USER=invuser \
-        --env POSTGRES_PASSWORD=invpass --env DB_HOST=host.docker.internal \
-        backend:ci
+      run: docker run --env POSTGRES_DB=inv --env POSTGRES_USER=invuser --env POSTGRES_PASSWORD=invpass --env DB_HOST=host.docker.internal backend:ci
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v4
