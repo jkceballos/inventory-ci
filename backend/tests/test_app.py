@@ -9,6 +9,7 @@ def test_get_items_empty(monkeypatch):
     class Cur:
         def execute(self, q): pass
         def fetchall(self): return []
+        def close(self): pass  # <-- Agrega esto
 
     class Conn:
         def cursor(self): return Cur()
