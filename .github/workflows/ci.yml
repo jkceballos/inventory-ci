@@ -38,14 +38,15 @@ jobs:
 
     # Run backend tests with coverage
     - name: Run backend tests
-      run: docker run \
-        --env PYTHONPATH=/app \
-        --env POSTGRES_DB=inv \
-        --env POSTGRES_USER=invuser \
-        --env POSTGRES_PASSWORD=invpass \
-        --env DB_HOST=host.docker.internal \
-        -v ${{ github.workspace }}/backend:/app \
-        backend:ci
+      run: |
+        docker run \
+          --env PYTHONPATH=/app \
+          --env POSTGRES_DB=inv \
+          --env POSTGRES_USER=invuser \
+          --env POSTGRES_PASSWORD=invpass \
+          --env DB_HOST=host.docker.internal \
+          -v ${{ github.workspace }}/backend:/app \
+          backend:ci
 
     # Subir a Codecov
     - name: Upload coverage to Codecov
