@@ -26,8 +26,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Build backend
-      run: docker build -t backend:ci ./backend
+    - name: Build backend test image
+      run: docker build -f backend/Dockerfile.test -t backend:ci ./backend
 
     - name: Run backend tests
       run: docker run --env POSTGRES_DB=inv --env POSTGRES_USER=invuser --env POSTGRES_PASSWORD=invpass --env DB_HOST=host.docker.internal backend:ci
